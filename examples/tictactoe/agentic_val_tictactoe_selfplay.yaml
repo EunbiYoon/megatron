@@ -46,7 +46,7 @@ logging_steps: 1
 eval_steps: 5
 resume_from_checkpoint: false
 
-rollout_batch_size: 12
+rollout_batch_size: 128
 val_batch_size: 16
 sequence_length: 32768
 
@@ -81,8 +81,8 @@ actor_train:
     weight_decay: 0.05
     adam_beta1: 0.9
     adam_beta2: 0.95
-    per_device_train_batch_size: 1
-    gradient_accumulation_steps: 4
+    per_device_train_batch_size: 2
+    gradient_accumulation_steps: 2
     warmup_steps: 10
   data_args:
     template: qwen3
@@ -120,7 +120,7 @@ actor_infer:
   strategy_args:
     strategy_name: vllm
     strategy_config:
-      gpu_memory_utilization: 0.9
+      gpu_memory_utilization: 0.8
       block_size: 16
       load_format: auto
   device_mapping: list(range(0,4))
