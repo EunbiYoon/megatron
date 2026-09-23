@@ -96,7 +96,7 @@ bash examples/multi_games/run_agentic_pipeline_multi_games_selfplay.sh
 
 # Specialist Agent (e.g., Tic-Tac-Toe)
 bash examples/tictactoe/run_agentic_pipeline_tictactoe_selfplay.sh
-
+bash examples/tictactoe/run_agentic_pipeline_tictactoe_selfplay_quickcheck.sh
 # ==============================
 # 2. Training with Fixed Opponent
 # ==============================

@@ -1,5 +1,23 @@
 # agentic_val_tictactoe_selfplay.yaml 변경사항 정리
 
+## 지금 쓰는 `salloc` 명령 (m1/m2 공통, `--job-name`만 다르게)
+
+지금까지 알아낸 문제들(CPU 1개만 잡힘, gpu037 노드 GPU 고장, mem 부족)을 전부 반영한 최종 형태:
+
+```bash
+salloc --account=pi_dagarwal_umass_edu --job-name=m1 --partition=gpu-preempt --nodes=1 \
+  --gres=gpu:l40s:4 --cpus-per-task=32 --mem=256G --time=08:00:00 \
+  --exclude=gpu037,gpu038 --mail-user=eunbiyoon@umass.edu --mail-type=BEGIN,END,FAIL,TIME_LIMIT_10
+```
+
+- `--gres=gpu:l40s:4`: GPU 4장 (TP=4 필요)
+- `--cpus-per-task=32`: L40S 노드는 32 CPU가 맥스 — 원래 이 옵션이 없어서 기본값 1로 잡혀 있었음(느렸던 원인)
+- `--mem=256G`: 노드 메모리 부족 OOM 방지
+- `--exclude=gpu037,gpu038`: gpu037은 GPU 하드웨어/드라이버 문제(NVML 에러) 있던 노드
+- `--time=08:00:00`: 8시간 — 200스텝 다 돌리기엔 부족할 수 있음(늘리려면 이 값만 키우면 됨)
+
+**주의**: `scancel -u $USER`나 `scancel --all`은 이 계정의 **모든 job(m1, m2 전부)**을 취소함 — 하나만 멈추고 싶으면 `scancel <해당 jobid>`로. 또한 이미 떠 있는 파이썬 프로세스만 재시작하고 싶으면(GPU 할당은 유지) `scancel` 자체가 필요 없음 — Ctrl+C로 프로세스만 멈추고 스크립트 다시 실행하면 됨.
+
 ## 검증(val) 관련
 
 | 항목 | 원래 | 지금 |
@@ -163,6 +181,62 @@ bundles.append({"GPU": self.gpu_per_node, "CPU": max(node_cpu / 2, 1)})
 **실제 성능에 영향 있는지 확인**: `cluster.py:132`에서 모든 워커(actor_train, actor_infer, env worker 등)는 액터당 `num_cpus=0.01`만 Ray에 요청함. 즉 placement group의 "16" 또는 "32"라는 숫자는 **Ray가 액터를 몇 개까지 동시 배치 허용할지 정하는 상한선**일 뿐(`16÷0.01=1600개`까지 허용) — 실제 액터는 20~30개뿐이라 16이든 32든 이 한도에 걸릴 일이 없음. **진짜 CPU 코어 개수를 결정하는 건 이 Ray 숫자가 아니라 SLURM cgroup(`--cpus-per-task`)** — 그건 이미 32로 고쳐서 실질적인 병목은 해결된 상태였음. 즉 이 수정은 **속도에 실질적 영향은 없을 가능성이 높지만**, Ray 대시보드 숫자를 실제 할당량(32)과 맞추기 위해 적용함.
 
 **수정**: `max(node_cpu / 2, 1)` → `max(node_cpu, 1)` (노드 CPU 전체를 placement group에 반영).
+
+## m1 train_step 안 entropy 계산 OOM (`roll/third_party/megatron/tensor_parallel.py`)
+
+```
+File "roll/third_party/megatron/tensor_parallel.py", line 11, in mul_reduce
+    return (a * b).sum(dim=-1, keepdim=True)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.64 GiB. (4.39 GiB free)
+```
+
+**원인**: `vocab_parallel_entropy`(TP=4 환경에서 entropy 계산, `train_step`의 loss 계산 경로에서 호출)가 `(total_nnz, vocab_size/tp_size)` 크기의 텐서 여러 개(`normalized_exp_logits`, `softmax_logits`, `mul_reduce`의 중간 곱 등)를 한 번에 통째로 만듦. `roll/utils/functionals.py`의 `entropy_from_logits`(추론용)와는 별개의, `train_step` 전용 구현이라 그때는 안 고쳤음.
+
+**수정**: `functionals.py`에서 썼던 것과 같은 시퀀스(row) 청크 처리(`chunk_size=2048`) 적용. 여기는 TP 랭크 간 `dist.all_reduce`(max, sum_exp, sum_softmax_times_logits)가 있어서, 청크마다 이 collective를 그대로 유지 — 각 행(row)의 entropy는 그 행의 vocab만 갖고 계산되므로(다른 행과 독립) 청크 단위로 나눠도 결과는 완전히 동일. 모든 TP 랭크가 같은 `total_nnz`/`chunk_size`를 쓰므로 청크 수가 랭크 간에 항상 일치해 collective가 lockstep 유지됨(이전에 겪은 weight-sync 데드락과 같은 실수를 피하려고 신경 씀).
+
+**위 수정 자체에 버그가 있었음 (바로 발견/수정)**:
+```
+File "roll/third_party/megatron/tensor_parallel.py", line 43
+    sum_softmax_times_logits_full[start:end] = chunk_sum_softmax_times_logits
+RuntimeError: The expanded size of the tensor (1) must match the existing size (32768) ...
+```
+`total_nnz = vocab_parallel_logits.shape[0]`로 2차원(`total_nnz, vocab_shard`)이라고 가정했는데, 실제 호출부(`op_compute_entropy`)에서는 **3차원**(`batch, seq_len, vocab_shard`)으로 들어옴. `batch=1`이라 `shape[0]=1`이 되어 청크가 사실상 안 나뉘고 전체(32768)를 한 번에 처리하면서, 미리 만든 작은 버퍼(`[1,1]`)에 큰 결과(`[32768,1]`)를 넣으려다 shape 에러. **재수정**: 입력을 `reshape(-1, vocab_shard_size)`로 먼저 2차원으로 펴서 처리하고, 끝나면 `view(orig_shape[:-1])`로 원래 shape(batch, seq_len)로 되돌리도록 변경 — 이제 2D/3D 어떤 모양으로 들어와도 올바르게 청크 처리됨.
+
+## 체크포인트 저장 실패: `ShardedTensor.flattened_range is not supported` (m2에서 발견, save_steps=20 첫 저장 시)
+
+```
+File ".../megatron/core/dist_checkpointing/mapping.py", line 134, in validate_metadata_integrity
+    raise CheckpointingException("ShardedTensor.flattened_range is not supported.")
+```
+
+**원인**: `use_distributed_optimizer: true`일 때 Megatron이 옵티마이저 상태를 파라미터 버킷 단위로 쪼개서 저장하는데, 그 버킷 슬라이스(`flattened_range`)를 체크포인트에 기록하는 기능이 지금 설치된 megatron-core 버전에서 무조건 `raise`하도록 막혀 있음(버전 제약/미구현으로 보임). 메모리 문제 아니라 순수 체크포인트 저장 경로 버그.
+
+`use_distributed_optimizer`는 DP(데이터병렬) 랭크들 사이에 옵티마이저 상태를 나눠 담아 메모리를 아끼는 기능인데, 지금은 `TP=4, DP=1`이라 나눠 담을 DP 랭크가 1개뿐 — 켜봤자 메모리 절감 효과가 전혀 없으면서 이 버그만 유발함.
+
+**수정**: `actor_train.strategy_args.strategy_config.use_distributed_optimizer: true → false`. DP=1이라 메모리 손해 없음.
+
+## 체크포인트 저장 실패 (2차): `mpu.get_data_modulo_expert_parallel_rank` 이름 바뀜
+
+`use_distributed_optimizer=false`로 고친 뒤 `flattened_range` 에러는 사라졌지만, 체크포인트 저장 코드의 그 다음 줄에서 또 다른 버전 호환성 에러 발생:
+
+```
+File "roll/distributed/strategy/megatron_strategy.py", line 510
+    elif not dist.is_initialized() or mpu.get_data_modulo_expert_parallel_rank() == 0:
+AttributeError: module 'megatron.core.parallel_state' has no attribute 'get_data_modulo_expert_parallel_rank'
+```
+
+**원인**: 지금 설치된 megatron-core 버전에서 이 함수가 `get_expert_data_parallel_rank`로 이름이 바뀜(다른 곳, 예: mcore_adapter의 `save_model_as_hf_inflight`에서도 이미 새 이름을 쓰고 있음 — 리포지토리의 이 파일만 옛 이름을 참조하고 있었음). 로직/의미는 동일(DP replica 중 하나만 optimizer state 저장), 순수 API 이름 변경.
+
+**수정**: `mpu.get_data_modulo_expert_parallel_rank()` → `mpu.get_expert_data_parallel_rank()`.
+
+## 빠른 확인용 설정/스크립트 분리 (`_quickcheck`)
+
+m1(진짜 설정, `rollout_batch_size=128`)과 m2(버그/체크포인트 등 빨리 확인용, `rollout_batch_size=12`)를 같은 yaml 파일로 계속 왔다갔다 수정하면서 돌리다가, 실수로 m2가 128로 시작돼버리는 사고가 생김(파일 수정 타이밍을 놓침). **PP=3 테스트할 때처럼 별도 파일로 완전히 분리**:
+
+- `examples/tictactoe/agentic_val_tictactoe_selfplay_quickcheck.yaml`: 메인 yaml 복사본, `rollout_batch_size: 12`만 다름
+- `examples/tictactoe/run_agentic_pipeline_tictactoe_selfplay_quickcheck.sh`: `--config_name agentic_val_tictactoe_selfplay_quickcheck` 사용, 출력 디렉토리도 `runs/tictactoe_selfplay_quickcheck/`로 분리(진짜 학습 run들과 안 섞이게)
+
+앞으로 m2에서 빠른 버그/수정 확인이 필요하면 이 스크립트를 쓰고, 메인 yaml(`agentic_val_tictactoe_selfplay.yaml`)은 항상 "진짜 설정"으로 유지.
 
 ## TP=4에서 가중치 동기화 NCCL 데드락 (30분 타임아웃)
 
