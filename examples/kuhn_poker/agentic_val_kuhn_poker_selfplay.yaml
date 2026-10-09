@@ -5,6 +5,10 @@ defaults:
   - ../config/deepspeed_zero3@_here_
   - ../config/deepspeed_zero3_cpuoffload@_here_
 
+lora_target: all-linear
+lora_rank: 32
+lora_alpha: 32
+
 hydra:
   run:
     dir: .
@@ -34,7 +38,7 @@ track_with: tensorboard
 tracker_kwargs:
   log_dir: /mnt/public/algm/tanzheyue/rl/rl_examples/exps/${exp_name}/tensorboard_logs
 
-num_gpus_per_node: 8
+num_gpus_per_node: 4
 
 max_steps: 200
 save_steps: 20
@@ -43,7 +47,7 @@ eval_steps: 5
 resume_from_checkpoint: false
 
 rollout_batch_size: 128
-val_batch_size: 1500
+val_batch_size: 128
 sequence_length: 32768
 
 # reward_clip: 10
@@ -60,7 +64,7 @@ kl_loss_coef: 0.20
 whiten_advantages: true
 entropy_loss_coef: 0
 
-pretrain: /mnt/public/yuanhuining/models/Qwen3-4B/
+pretrain: /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/
 
 actor_train:
   model_args:
@@ -68,6 +72,9 @@ actor_train:
     disable_gradient_checkpointing: false
     dtype: bf16
     model_type: ~
+    lora_target: ${lora_target}      # 추가
+    lora_rank: ${lora_rank}          # 추가
+    lora_alpha: ${lora_alpha}        # 추가
   training_args:
     lr_scheduler_type: cosine_with_min_lr
     learning_rate: 1e-6
@@ -86,18 +93,21 @@ actor_train:
       tensor_model_parallel_size: 4
       pipeline_model_parallel_size: 1
       expert_model_parallel_size: 1
-      use_distributed_optimizer: true
+      use_distributed_optimizer: false
       recompute_granularity: full
       accumulate_allreduce_grads_in_fp32: true
       check_for_nan_in_loss_and_grad: false
-  device_mapping: list(range(0,8))
-  infer_batch_size: 2
+  device_mapping: list(range(0,4))
+  infer_batch_size: 1
 
 actor_infer:
   model_args:
     flash_attn: fa2
     disable_gradient_checkpointing: true
     dtype: bf16
+    lora_target: ${lora_target}      # 추가
+    lora_rank: ${lora_rank}          # 추가
+    lora_alpha: ${lora_alpha}        # 추가
   generating_args:
     max_new_tokens: 4096 # single-turn response length
     top_p: 0.99
@@ -113,7 +123,8 @@ actor_infer:
       gpu_memory_utilization: 0.8
       block_size: 16
       load_format: auto
-  device_mapping: list(range(0,8))
+  device_mapping: list(range(0,4))
+  infer_batch_size: 16
 
 reference:
   model_args:
@@ -126,8 +137,8 @@ reference:
   strategy_args:
     strategy_name: hf_infer
     strategy_config: ~
-  device_mapping: list(range(0,8))
-  infer_batch_size: 2
+  device_mapping: list(range(0,4))
+  infer_batch_size: 1
 
 enable_response_mask: True
 action_sep: "||"
@@ -149,7 +160,7 @@ custom_envs:
     max_actions_per_traj: ${max_actions_per_traj}
     grid_vocab: false
     env_config:
-      built_in_opponent: none
+      built_in_opponent: none  # self-play training
       render_mode: text
 
   TicTacToe-first-100:
@@ -300,23 +311,10 @@ train_env_manager:
 
 val_env_manager:
   max_env_num_per_worker: 32
-  env_groups: 480
+  env_groups: 128
   group_size: 1
   tags: [
-    TicTacToe-first-100, 
-    TicTacToe-second-100, 
-    TicTacToe-first-1000, 
-    TicTacToe-second-1000,
-    Connect4-first-100,
-    Connect4-second-100,
-    Connect4-first-1000,
-    Connect4-second-1000,
     KuhnPoker-first,
-    KuhnPoker-second,
-    LeducPoker-first,
-    LeducPoker-second,
-    MiniHanabi,
-    SimpleHanabi,
-    FullHanabi
+    KuhnPoker-second
   ]
-  n_groups: [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32] #
+  n_groups: [64, 64] #

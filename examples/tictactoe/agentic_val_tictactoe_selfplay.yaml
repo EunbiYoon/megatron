@@ -43,7 +43,7 @@ num_gpus_per_node: 4
 max_steps: 200
 save_steps: 20
 logging_steps: 1
-eval_steps: 5
+eval_steps: 5 # (check what is that mean)
 resume_from_checkpoint: false
 
 rollout_batch_size: 128
@@ -77,8 +77,8 @@ actor_train:
     lora_alpha: ${lora_alpha}        # 추가
   training_args:
     lr_scheduler_type: cosine_with_min_lr
-    learning_rate: 1e-6
-    weight_decay: 0.05
+    learning_rate: 1e-6 #### 1) 1e-5 --->9/30
+    weight_decay: 0.05 
     adam_beta1: 0.9
     adam_beta2: 0.95
     per_device_train_batch_size: 2
