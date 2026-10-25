@@ -9,6 +9,7 @@ import ray
 import torch
 import torch.distributed as dist
 from codetiming import Timer
+from peft import PeftModel, get_peft_model_state_dict
 from megatron.core import mpu, DistributedDataParallel, dist_checkpointing, tensor_parallel
 from megatron.core.dist_checkpointing.strategies.fully_parallel import (
     FullyParallelLoadStrategyWrapper,
@@ -481,7 +482,21 @@ class MegatronTrainStrategy(MegatronInferStrategy, TrainStrategy):
             self.load_states()
 
         # save model and tokenizer
-        if len(self.models_unwrapped) == 1:
+        if isinstance(self.models_unwrapped[0], PeftModel):
+            # LoRA: save only adapter weights (mcore format, one dir per adapter), same as
+            # mcore_adapter's VirtualModels.save_pretrained; base weights are the pretrain ckpt
+            assert len(self.models_unwrapped) == 1, "LoRA checkpointing does not support virtual pipeline"
+            peft_model = self.models_unwrapped[0]
+            for adapter_name, peft_config in peft_model.peft_config.items():
+                adapter_save_dir = os.path.join(save_dir, adapter_name)
+                if dist.get_rank() == 0:
+                    peft_config.save_pretrained(adapter_save_dir)
+                peft_state_dict = get_peft_model_state_dict(
+                    peft_model, peft_model.state_dict_for_save_checkpoint(), adapter_name
+                )
+                peft_model.base_model.model.save_pretrained(adapter_save_dir, state_dict={"model": peft_state_dict})
+            self.model.config.save_pretrained(save_dir)
+        elif len(self.models_unwrapped) == 1:
             self.models_unwrapped[0].save_pretrained(save_dir)
         else:
             state_dict = {f"model{i}": model.state_dict_for_save_checkpoint() for i, model in

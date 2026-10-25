@@ -1,0 +1,978 @@
+2026-10-24 00:31:36,062	INFO scripts.py:1392 -- Did not find any active Ray processes.
+Loading libiconv version 1.17
+Loading xz version 5.4.6
+Loading zlib-ng version 2.1.6
+Loading libxml2 version 2.10.3
+Loading cuda version 12.4.1
+/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/examples/start_agentic_pipeline.py:19: Hydra14MigrationWarning: 
+The version_base parameter is not specified.
+Hydra will assume defaults for version 1.1.
+Hydra 1.4 will remove this compatibility behavior.
+Before upgrading to Hydra 1.4, set version_base="1.3" and test your application.
+See https://hydra.cc/docs/upgrades/1.3_to_1.4/prepare_for_1_4/ for preparation instructions.
+  initialize(config_path=args.config_path, job_name="app")
+/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/hydra/_internal/defaults_list.py:251: UserWarning: In 'agentic_val_tictactoe_selfplay_fix_lr2e6': Defaults list is missing `_self_`. See https://hydra.cc/docs/1.2/upgrades/1.0_to_1.1/default_composition_order for more information
+  warnings.warn(msg, UserWarning)
+add logger: log_rank_DRIVER_0_1
+Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_DRIVER_0_1.log
+custom_env:
+  SimpleSokoban:
+    env_type: sokoban
+    max_actions_per_traj: 10
+    env_instruction: You are solving the Sokoban puzzle. You are the player and you
+      need to push all boxes to targets. When you are right next to a box, you can
+      push it by moving in the same direction. You cannot push a box through a wall,
+      and you cannot pull a box. The answer should be a sequence of actions, like
+      <answer>Right || Right || Up</answer>
+    max_tokens: 100
+    env_config:
+      dim_x: 6
+      dim_y: 6
+      num_boxes: 1
+      max_steps: 100
+  LargerSokoban:
+    env_type: sokoban
+    max_actions_per_traj: 10
+    env_instruction: You are solving the Sokoban puzzle. You are the player and you
+      need to push all boxes to targets. When you are right next to a box, you can
+      push it by moving in the same direction. You cannot push a box through a wall,
+      and you cannot pull a box. The answer should be a sequence of actions, like
+      <answer>Right || Right || Up</answer>
+    max_tokens: 100
+    env_config:
+      dim_x: 8
+      dim_y: 8
+      num_boxes: 2
+      max_steps: 100
+      search_depth: 10
+  SokobanDifferentGridVocab:
+    env_type: sokoban
+    max_actions_per_traj: 10
+    env_instruction: You are solving the Sokoban puzzle. You are the player and you
+      need to push all boxes to targets. When you are right next to a box, you can
+      push it by moving in the same direction. You cannot push a box through a wall,
+      and you cannot pull a box. The answer should be a sequence of actions, like
+      <answer>Right || Right || Up</answer>
+    max_tokens: 100
+    env_config:
+      search_depth: 30
+      dim_x: 6
+      dim_y: 6
+      num_boxes: 1
+      max_steps: 100
+      grid_lookup:
+        0: W
+        1: .
+        2: G
+        3: C
+        4: B
+        5: A
+        6: '@'
+      grid_vocab:
+        W: wall
+        .: empty
+        G: target
+        C: box on target
+        B: box
+        A: player
+        '@': player on target
+  VisualSimpleSokoban:
+    env_type: sokoban
+    max_actions_per_traj: 10
+    env_instruction: You are solving the Sokoban puzzle. You are the player and you
+      need to push all boxes to targets. When you are right next to a box, you can
+      push it by moving in the same direction. You cannot push a box through a wall,
+      and you cannot pull a box. The answer should be a sequence of actions, like
+      <answer>Right || Right || Up</answer>
+    max_tokens: 100
+    env_config:
+      dim_x: 6
+      dim_y: 6
+      num_boxes: 1
+      max_steps: 100
+      render_mode: rgb_array
+  Countdown:
+    env_type: countdown
+    max_actions_per_traj: 1
+    env_instruction: 'You are solving the Countdown puzzle. You should use the num
+      list to create an equation that equals the target. Example answer format: <think>
+      To find an equation using [3, 5, 2] to get 4. Let''s check 2 + 5 = 7, 7 - 3
+      = 4. So the answer is 2 + 5 - 3 = 4. </think><answer>2 + 5 - 3</answer>'
+    max_tokens: 100
+    env_config: null
+  Bandit:
+    env_type: bandit
+    max_actions_per_traj: 1
+    env_instruction: ''
+    max_tokens: 100
+    env_config:
+      lo_arm_name: Phoenix
+      hi_arm_name: Dragon
+  BanditTest:
+    env_type: bandit
+    max_actions_per_traj: 1
+    env_instruction: ''
+    max_tokens: 100
+    env_config:
+      lo_arm_name: Trader
+      hi_arm_name: Librarian
+  FrozenLake:
+    env_type: frozen_lake
+    max_actions_per_traj: 10
+    env_instruction: You are solving the FrozenLake puzzle. Forbid the whole and go
+      to the target. You may move to the unintended direction due to the slippery
+      ice. The answer must be a sequence of actions, like <answer>Right || Right ||
+      Up</answer>
+    max_tokens: 100
+    env_config: null
+  MetamathQA:
+    env_type: metamathqa
+    max_actions_per_traj: 1
+    env_instruction: 'You are solving Math problems. '
+    max_tokens: 100
+    env_config: null
+  WebShop:
+    env_type: webshop
+    max_actions_per_traj: 30
+    env_instruction: 'You are browsing an online shop. Based on the instruction, find
+      the product that matches the production description. You need to iteratively
+      take action, read the website and decide what action to take next until finding
+      the product. Available actions depends on the page: in the search page you can
+      search keywords, in the search result page you can click an item url or click[next
+      >] to navigate to next page, in the product page you can click[description]
+      or click[features] to see the details, click[blue] or click[x-large] to choose
+      size and colors, click[buy now] when you decided to buy the product, click[back
+      to search] to return to search page. Example process: I need a gingko light
+      and 20x20 pillow cover that is hand painted. First search[gingko light 20x20
+      pillow cover hand painted], answer format: <answer>search[blanket with fleece
+      throw]</answer>. Valid answer is search[<keywords>] or click[<clickable>].'
+    max_tokens: 100
+    env_config: null
+deepspeed_zero:
+  train_micro_batch_size_per_gpu: auto
+  bf16:
+    enabled: true
+  fp16:
+    enabled: false
+    loss_scale: 0
+    initial_scale_power: 16
+    loss_scale_window: 1000
+    hysteresis: 2
+    min_loss_scale: 1
+  zero_optimization:
+    stage: 0
+  checkpoint:
+    tag_validation: IGNORE
+deepspeed_zero2:
+  train_micro_batch_size_per_gpu: auto
+  bf16:
+    enabled: true
+  fp16:
+    enabled: false
+    loss_scale: 0
+    initial_scale_power: 16
+    loss_scale_window: 1000
+    hysteresis: 2
+    min_loss_scale: 1
+  zero_optimization:
+    stage: 2
+    allgather_partitions: true
+    allgather_bucket_size: 1000000000.0
+    overlap_comm: true
+    reduce_scatter: true
+    reduce_bucket_size: 500000000.0
+    contiguous_gradients: true
+deepspeed_zero3:
+  train_micro_batch_size_per_gpu: auto
+  bf16:
+    enabled: true
+  fp16:
+    enabled: false
+    loss_scale: 0
+    initial_scale_power: 16
+    loss_scale_window: 1000
+    hysteresis: 2
+    min_loss_scale: 1
+  zero_optimization:
+    stage: 3
+    overlap_comm: true
+    contiguous_gradients: true
+    sub_group_size: 1000000000.0
+    reduce_bucket_size: auto
+    stage3_prefetch_bucket_size: auto
+    stage3_param_persistence_threshold: auto
+    stage3_max_live_parameters: 1000000000.0
+    stage3_max_reuse_distance: 1000000000.0
+    stage3_gather_16bit_weights_on_model_save: true
+deepspeed_zero3_cpuoffload:
+  train_micro_batch_size_per_gpu: auto
+  bf16:
+    enabled: true
+  fp16:
+    enabled: false
+    loss_scale: 0
+    initial_scale_power: 16
+    loss_scale_window: 1000
+    hysteresis: 2
+    min_loss_scale: 1
+  zero_optimization:
+    stage: 3
+    offload_optimizer:
+      device: cpu
+      pin_memory: true
+    overlap_comm: true
+    contiguous_gradients: true
+    sub_group_size: 1000000000.0
+    reduce_bucket_size: auto
+    stage3_prefetch_bucket_size: auto
+    stage3_param_persistence_threshold: auto
+    stage3_max_live_parameters: 1000000000.0
+    stage3_max_reuse_distance: 1000000000.0
+    stage3_gather_16bit_weights_on_model_save: true
+exp_name: agentic_pipeline
+seed: 42
+logging_dir: /mnt/public/algm/tanzheyue/rl/rl_examples/exps/agentic_pipeline/output/logs
+output_dir: /mnt/public/algm/tanzheyue/rl/rl_examples/exps/agentic_pipeline/output
+system_envs:
+  USE_MODELSCOPE: '1'
+track_with: tensorboard
+tracker_kwargs:
+  log_dir: /mnt/public/algm/tanzheyue/rl/rl_examples/exps/agentic_pipeline/tensorboard_logs
+num_gpus_per_node: 4
+max_steps: 200
+save_steps: 20
+logging_steps: 1
+eval_steps: 10
+resume_from_checkpoint: false
+rollout_batch_size: 128
+val_batch_size: 64
+sequence_length: 32768
+dual_clip_loss: true
+ppo_epochs: 1
+adv_estimator: reinforce
+init_kl_coef: 0.0
+use_kl_loss: true
+kl_loss_coef: 0.2
+whiten_advantages: true
+entropy_loss_coef: 0
+pretrain: /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/
+actor_train:
+  model_args:
+    flash_attn: fa2
+    disable_gradient_checkpointing: false
+    dtype: bf16
+    model_type: null
+  training_args:
+    lr_scheduler_type: cosine_with_min_lr
+    learning_rate: 2.0e-06
+    weight_decay: 0.05
+    adam_beta1: 0.9
+    adam_beta2: 0.95
+    per_device_train_batch_size: 1
+    gradient_accumulation_steps: 8
+    warmup_steps: 160
+  data_args:
+    template: qwen3
+  strategy_args:
+    strategy_name: megatron_train
+    strategy_config:
+      sequence_parallel: true
+      tensor_model_parallel_size: 4
+      pipeline_model_parallel_size: 1
+      expert_model_parallel_size: 1
+      use_distributed_optimizer: false
+      recompute_granularity: full
+      accumulate_allreduce_grads_in_fp32: true
+      check_for_nan_in_loss_and_grad: false
+      lr_scheduler_kwargs:
+        min_lr: 2.0e-07
+  device_mapping: list(range(0,4))
+  infer_batch_size: 1
+actor_infer:
+  model_args:
+    flash_attn: fa2
+    disable_gradient_checkpointing: true
+    dtype: bf16
+  generating_args:
+    max_new_tokens: 4096
+    top_p: 0.99
+    top_k: 100
+    num_beams: 1
+    temperature: 0.6
+    num_return_sequences: 1
+  data_args:
+    template: qwen3
+  strategy_args:
+    strategy_name: vllm
+    strategy_config:
+      gpu_memory_utilization: 0.8
+      block_size: 16
+      load_format: auto
+  device_mapping: list(range(0,4))
+  infer_batch_size: 16
+reference:
+  model_args:
+    flash_attn: fa2
+    disable_gradient_checkpointing: true
+    dtype: bf16
+    model_type: null
+  data_args:
+    template: qwen3
+  strategy_args:
+    strategy_name: hf_infer
+    strategy_config: null
+  device_mapping: list(range(0,4))
+  infer_batch_size: 1
+enable_response_mask: true
+action_sep: '||'
+use_turn_scores: true
+enable_think: true
+max_actions_per_traj: 50
+reward_normalization:
+  grouping: tags
+  method: mean
+  separate_norm_for_selfplay: true
+whiten_rewards: true
+advantage_norm: mean
+pg_clip_high: 0.2
+custom_envs:
+  TicTacToe:
+    env_type: tictactoe
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: none
+      render_mode: text
+  TicTacToe-first-100:
+    env_type: tictactoe
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      render_mode: text
+  TicTacToe-second-100:
+    env_type: tictactoe
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      opponent_player: 0
+      render_mode: text
+  TicTacToe-first-1000:
+    env_type: tictactoe
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      max_simulations: 1000
+      render_mode: text
+  TicTacToe-second-1000:
+    env_type: tictactoe
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      opponent_player: 0
+      max_simulations: 1000
+      render_mode: text
+  Connect4-first-100:
+    env_type: connect_four
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      render_mode: text
+  Connect4-second-100:
+    env_type: connect_four
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      opponent_player: 0
+      render_mode: text
+  Connect4-first-1000:
+    env_type: connect_four
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      max_simulations: 1000
+      render_mode: text
+  Connect4-second-1000:
+    env_type: connect_four
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: mcts
+      opponent_player: 0
+      max_simulations: 1000
+      render_mode: text
+  KuhnPoker-first:
+    env_type: kuhn_poker
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: cfr
+      render_mode: text
+  KuhnPoker-second:
+    env_type: kuhn_poker
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: cfr
+      opponent_player: 0
+      render_mode: text
+  LeducPoker-first:
+    env_type: leduc_poker
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: ne
+      render_mode: text
+  LeducPoker-second:
+    env_type: leduc_poker
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      built_in_opponent: ne
+      opponent_player: 0
+      render_mode: text
+  MiniHanabi:
+    env_type: hanabi
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      render_mode: text
+  SimpleHanabi:
+    env_type: hanabi
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      render_mode: text
+      colors: 3
+      ranks: 2
+      hand_size: 5
+      max_information_tokens: 8
+      max_life_tokens: 3
+  FullHanabi:
+    env_type: hanabi
+    max_actions_per_traj: 50
+    grid_vocab: false
+    env_config:
+      render_mode: text
+      colors: 3
+      ranks: 3
+      hand_size: 5
+      max_information_tokens: 8
+      max_life_tokens: 3
+train_env_manager:
+  format_penalty: 0.05
+  max_env_num_per_worker: 64
+  env_groups: 64
+  group_size: 1
+  tags:
+  - TicTacToe
+  n_groups:
+  - 64
+val_env_manager:
+  max_env_num_per_worker: 32
+  env_groups: 64
+  group_size: 1
+  tags:
+  - TicTacToe-first-100
+  - TicTacToe-second-100
+  - TicTacToe-first-1000
+  - TicTacToe-second-1000
+  n_groups:
+  - 16
+  - 16
+  - 16
+  - 16
+
+[2026-10-24 00:31:41] [agentic_config.py (62)] [INFO] [DRIVER 0 / 1][PID 2345257] max_env_num_per_worker: 64
+[2026-10-24 00:31:41] [agentic_config.py (62)] [INFO] [DRIVER 0 / 1][PID 2345257] max_env_num_per_worker: 32
+[2026-10-24 00:31:41] [worker_config.py (103)] [INFO] [DRIVER 0 / 1][PID 2345257] set vllm num_gpus_per_worker to 1, tensor_parallel_size: 1, pipeline_parallel_size: 1
+[2026-10-24 00:31:41] [base_config.py (166)] [INFO] [DRIVER 0 / 1][PID 2345257] add exp_name to logging_dir ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[2026-10-24 00:31:41] [base_config.py (171)] [INFO] [DRIVER 0 / 1][PID 2345257] add timestamp to tensorboard log_dir ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/tensorboard
+[2026-10-24 00:31:41] [agentic_config.py (228)] [INFO] [DRIVER 0 / 1][PID 2345257] add timestamp to render_save_dir  None
+EnvManagerConfig(name='train_env', worker_cls='roll.pipeline.agentic.environment_worker.EnvironmentWorker', model_args=ModelArguments(model_name_or_path='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', attn_implementation=None, moe_aux_loss_coef=None, disable_gradient_checkpointing=False, device_map='balanced', dtype='bf16', model_type=None, num_labels=1, model_config_kwargs={}, freeze_module_prefix=None, lora_target=None, lora_rank=8, lora_alpha=None, lora_dropout=0.0), training_args=TrainingArguments(output_dir='', max_steps=-1, num_train_epochs=1.0, learning_rate=5e-05, lr_scheduler_type='linear', weight_decay=0.0, adam_beta1=0.9, adam_beta2=0.999, per_device_train_batch_size=8, gradient_accumulation_steps=1, seed=42, data_seed=None, dataloader_num_workers=0, fp16=False, bf16=False, tf32=None, warmup_ratio=0.03, warmup_steps=0), data_args=None, generating_args=GeneratingArguments(do_sample=True, temperature=0.6, top_p=0.99, top_k=100, num_beams=1, max_length=512, max_new_tokens=4096, repetition_penalty=1.0, length_penalty=1.0, num_return_sequences=1), strategy_args=None, world_size=1, device_mapping=None, num_gpus_per_worker=1, model_update_frequency=1, infer_batch_size=16, backend_timeout=30, system_envs={}, env_groups=64, group_size=1, tags=['TicTacToe'], n_groups=[64], max_traj_per_env=-1, format_penalty=0.05, max_env_num_per_worker=64)
+EnvManagerConfig(name='val_env', worker_cls='roll.pipeline.agentic.environment_worker.EnvironmentWorker', model_args=ModelArguments(model_name_or_path='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', attn_implementation=None, moe_aux_loss_coef=None, disable_gradient_checkpointing=False, device_map='balanced', dtype='bf16', model_type=None, num_labels=1, model_config_kwargs={}, freeze_module_prefix=None, lora_target=None, lora_rank=8, lora_alpha=None, lora_dropout=0.0), training_args=TrainingArguments(output_dir='', max_steps=-1, num_train_epochs=1.0, learning_rate=5e-05, lr_scheduler_type='linear', weight_decay=0.0, adam_beta1=0.9, adam_beta2=0.999, per_device_train_batch_size=8, gradient_accumulation_steps=1, seed=42, data_seed=None, dataloader_num_workers=0, fp16=False, bf16=False, tf32=None, warmup_ratio=0.03, warmup_steps=0), data_args=None, generating_args=GeneratingArguments(do_sample=True, temperature=0.6, top_p=0.99, top_k=100, num_beams=1, max_length=512, max_new_tokens=4096, repetition_penalty=1.0, length_penalty=1.0, num_return_sequences=1), strategy_args=None, world_size=2, device_mapping=None, num_gpus_per_worker=1, model_update_frequency=1, infer_batch_size=16, backend_timeout=30, system_envs={}, env_groups=64, group_size=1, tags=['TicTacToe-first-100', 'TicTacToe-second-100', 'TicTacToe-first-1000', 'TicTacToe-second-1000'], n_groups=[16, 16, 16, 16], max_traj_per_env=-1, format_penalty=0, max_env_num_per_worker=32)
+[2026-10-24 00:31:41] [agentic_config.py (246)] [INFO] [DRIVER 0 / 1][PID 2345257] train_env_manager.max_traj_per_env: 2
+[2026-10-24 00:31:41] [agentic_config.py (253)] [INFO] [DRIVER 0 / 1][PID 2345257] val_env_manager.max_traj_per_env: 1
+[2026-10-24 00:31:43] [initialize.py (59)] [INFO] [DRIVER 0 / 1][PID 2345257] Starting ray cluster: ray start --head --port=6379 --node-name=127.0.0.1:0 --temp-dir=/tmp/ray --dashboard-host=0.0.0.0
+2026-10-24 00:31:48,476	INFO worker.py:1694 -- Connecting to existing Ray cluster at address: 10.100.20.25:6379...
+2026-10-24 00:31:48,491	INFO worker.py:1879 -- Connected to Ray cluster. View the dashboard at [1m[32m10.100.20.25:8265 [39m[22m
+[2026-10-24 00:31:49] [initialize.py (88)] [INFO] [DRIVER 0 / 1][PID 2345257] Ray cluster initialized
+2026-10-24 00:31:49,860	INFO log_monitor.py:157 -- Starting log monitor with [max open files=200], [is_autoscaler_v2=False]
+[2026-10-24 00:31:49] [initialize.py (95)] [INFO] [DRIVER 0 / 1][PID 2345257] Current ray cluster resources: {'CPU': 32.0, 'object_store_memory': 159268088217.0, 'accelerator_type:L40S': 1.0, 'node:__internal_head__': 1.0, 'node:10.100.20.25': 1.0, 'memory': 371625539175.0, 'GPU': 4.0}
+[2026-10-24 00:31:59,507] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+gpu ranks: [['0', '1', '3', '2']]
+node2pg: {0: <ray.util.placement_group.PlacementGroup object at 0x70c1c45e30a0>}
+[2026-10-24 00:32:24] [checkpoint_manager.py (55)] [INFO] [DRIVER 0 / 1][PID 2345257] checkpoint_config: {}
+[2026-10-24 00:32:24] [tracking.py (116)] [INFO] [DRIVER 0 / 1][PID 2345257] create tracker tensorboard, kwargs: {'log_dir': './runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/tensorboard'}
+[2026-10-24 00:32:24] [agentic_config.py (313)] [INFO] [DRIVER 0 / 1][PID 2345257] pipeline max_steps: 200 to 200
+[2026-10-24 00:32:24] [agentic_config.py (314)] [INFO] [DRIVER 0 / 1][PID 2345257] actor train max_steps without dp_size: 3200
+[2026-10-24 00:32:24] [agentic_config.py (315)] [INFO] [DRIVER 0 / 1][PID 2345257] critic train max_steps without dp_size: 3200
+[2026-10-24 00:32:24] [cluster.py (43)] [INFO] [DRIVER 0 / 1][PID 2345257] wrap ActorWorker to ray.remote()
+[36m(SharedStorage pid=2348902, ip=10.100.20.25)[0m MASTER_ADDR_PORT:10.100.20.25:48009 is not found in storage
+[36m(pid=2348781, ip=10.100.20.25)[0m add logger: log_rank_actor_train-0_0_4
+[36m(pid=2348781, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2348781, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_train-0_0_4.log
+[36m(pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:32:32,263] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/SharedStorage.log
+[36m(pid=2348976, ip=10.100.20.25)[0m add logger: log_rank_actor_train-3_3_4
+[36m(pid=2348976, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2348975, ip=10.100.20.25)[0m add logger: log_rank_actor_train-2_2_4
+[36m(pid=2348975, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2348976, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_train-3_3_4.log
+[36m(pid=2348976, ip=10.100.20.25)[0m [2026-10-24 00:32:57,809] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[36m(pid=2348974, ip=10.100.20.25)[0m add logger: log_rank_actor_train-1_1_4
+[36m(pid=2348974, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2348974, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_train-1_1_4.log[32m [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+[2026-10-24 00:33:14] [cluster.py (43)] [INFO] [DRIVER 0 / 1][PID 2345257] wrap ActorWorker to ray.remote()
+[36m(SharedStorage pid=2348902, ip=10.100.20.25)[0m MASTER_ADDR_PORT:10.100.20.25:56169 is not found in storage
+[36m(pid=2349331, ip=10.100.20.25)[0m add logger: log_rank_actor_infer-0_0_4
+[36m(pid=2349331, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2348975, ip=10.100.20.25)[0m [2026-10-24 00:32:57,975] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)[32m [repeated 2x across cluster][0m
+[36m(pid=2349331, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_infer-0_0_4.log
+[36m(pid=2349453, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_infer-1_1_4.log
+[36m(pid=2349453, ip=10.100.20.25)[0m add logger: log_rank_actor_infer-1_1_4
+[36m(pid=2349453, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:33:22,339] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[36m(pid=2349454, ip=10.100.20.25)[0m add logger: log_rank_actor_infer-2_2_4
+[36m(pid=2349454, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2349453, ip=10.100.20.25)[0m [2026-10-24 00:33:45,342] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2026-10-24 00:34:00] [cluster.py (43)] [INFO] [DRIVER 0 / 1][PID 2345257] wrap ActorWorker to ray.remote()
+[36m(SharedStorage pid=2348902, ip=10.100.20.25)[0m MASTER_ADDR_PORT:10.100.20.25:48049 is not found in storage
+[36m(pid=2349808, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_reference-0_0_4.log[32m [repeated 3x across cluster][0m
+[36m(pid=2349808, ip=10.100.20.25)[0m add logger: log_rank_reference-0_0_4[32m [repeated 2x across cluster][0m
+[36m(pid=2349808, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs[32m [repeated 2x across cluster][0m
+[36m(pid=2349455, ip=10.100.20.25)[0m [2026-10-24 00:33:45,742] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)[32m [repeated 2x across cluster][0m
+[36m(pid=2349808, ip=10.100.20.25)[0m [2026-10-24 00:34:10,182] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[36m(pid=2349954, ip=10.100.20.25)[0m add logger: log_rank_reference-3_3_4
+[36m(pid=2349954, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2349954, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_reference-3_3_4.log
+[36m(pid=2349952, ip=10.100.20.25)[0m [2026-10-24 00:34:33,492] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2026-10-24 00:34:49] [cluster.py (43)] [INFO] [DRIVER 0 / 1][PID 2345257] wrap EnvironmentWorker to ray.remote()
+[36m(pid=2350313, ip=10.100.20.25)[0m No CUDA runtime is found, using CUDA_HOME='/modules/spack/packages/linux-ubuntu24.04-x86_64_v3/gcc-13.2.0/cuda-12.4.1-r5m2xtnxqs7cmmqvdozajqynuvriqdkb'
+[36m(SharedStorage pid=2348902, ip=10.100.20.25)[0m MASTER_ADDR_PORT:10.100.20.25:56885 is not found in storage
+[36m(pid=2350310, ip=10.100.20.25)[0m add logger: log_rank_DRIVER_0_1[32m [repeated 3x across cluster][0m
+[36m(pid=2350310, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs[32m [repeated 3x across cluster][0m
+[36m(pid=2350310, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_DRIVER_0_1.log[32m [repeated 3x across cluster][0m
+[36m(pid=2349953, ip=10.100.20.25)[0m [2026-10-24 00:34:33,573] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)[32m [repeated 2x across cluster][0m
+[36m(pid=2350313, ip=10.100.20.25)[0m [2026-10-24 00:34:56,855] [WARNING] [real_accelerator.py:181:get_accelerator] Setting accelerator to CPU. If you have GPU or other accelerator, we were unable to detect it.
+[36m(pid=2350313, ip=10.100.20.25)[0m [2026-10-24 00:34:56,859] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cpu (auto detect)
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/RequestScheduler.log
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(pid=2350313, ip=10.100.20.25)[0m add logger: log_rank_train_env-0_0_1
+[36m(pid=2350313, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2350313, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_train_env-0_0_1.log
+[36m(RequestScheduler pid=2350310, ip=10.100.20.25)[0m [2026-10-24 00:34:57,122] [WARNING] [real_accelerator.py:181:get_accelerator] Setting accelerator to CPU. If you have GPU or other accelerator, we were unable to detect it.
+[36m(RequestScheduler pid=2350310, ip=10.100.20.25)[0m [2026-10-24 00:34:57,124] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cpu (auto detect)
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/EnvironmentWorker(train_env-0).log
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[36m(EnvironmentWorker(train_env-0) pid=2350313, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+[2026-10-24 00:36:03] [cluster.py (43)] [INFO] [DRIVER 0 / 1][PID 2345257] wrap EnvironmentWorker to ray.remote()
+[36m(pid=2352785, ip=10.100.20.25)[0m No CUDA runtime is found, using CUDA_HOME='/modules/spack/packages/linux-ubuntu24.04-x86_64_v3/gcc-13.2.0/cuda-12.4.1-r5m2xtnxqs7cmmqvdozajqynuvriqdkb'[32m [repeated 2x across cluster][0m
+[36m(SharedStorage pid=2348902, ip=10.100.20.25)[0m MASTER_ADDR_PORT:10.100.20.25:55121 is not found in storage
+[36m(pid=2353121, ip=10.100.20.25)[0m No CUDA runtime is found, using CUDA_HOME='/modules/spack/packages/linux-ubuntu24.04-x86_64_v3/gcc-13.2.0/cuda-12.4.1-r5m2xtnxqs7cmmqvdozajqynuvriqdkb'[32m [repeated 2x across cluster][0m
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/megatron/core/transformer/transformer_config.py:1705: UserWarning: full scope is deprecated. Use empty cuda_graph_scope to capture the whole layer.
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m   warnings.warn(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/transformer_engine/pytorch/module/base.py:804: UserWarning: To guarantee overlapping TP and SP collectives with the backwardGEMMs, set environment variable CUDA_DEVICE_MAX_CONNECTIONS = 1
+[36m(pid=2352783, ip=10.100.20.25)[0m add logger: log_rank_DRIVER_0_1
+[36m(pid=2352783, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2352783, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_DRIVER_0_1.log
+[36m(RequestScheduler pid=2352783, ip=10.100.20.25)[0m [2026-10-24 00:36:14,463] [WARNING] [real_accelerator.py:181:get_accelerator] Setting accelerator to CPU. If you have GPU or other accelerator, we were unable to detect it.
+[36m(RequestScheduler pid=2352783, ip=10.100.20.25)[0m [2026-10-24 00:36:14,467] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cpu (auto detect)
+[36m(pid=2352785, ip=10.100.20.25)[0m add logger: log_rank_val_env-0_0_2
+[36m(pid=2352785, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2352785, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_val_env-0_0_2.log
+[36m(pid=2353121, ip=10.100.20.25)[0m add logger: log_rank_val_env-1_1_2
+[36m(pid=2353121, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(pid=2353121, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_val_env-1_1_2.log
+[36m(pid=2352785, ip=10.100.20.25)[0m [2026-10-24 00:36:16,565] [WARNING] [real_accelerator.py:181:get_accelerator] Setting accelerator to CPU. If you have GPU or other accelerator, we were unable to detect it.
+[36m(pid=2352785, ip=10.100.20.25)[0m [2026-10-24 00:36:16,567] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cpu (auto detect)
+[36m(pid=2353121, ip=10.100.20.25)[0m [2026-10-24 00:36:39,480] [WARNING] [real_accelerator.py:181:get_accelerator] Setting accelerator to CPU. If you have GPU or other accelerator, we were unable to detect it.
+[36m(pid=2353121, ip=10.100.20.25)[0m [2026-10-24 00:36:39,481] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cpu (auto detect)
+[36m(EnvironmentWorker(val_env-0) pid=2352785, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/EnvironmentWorker(val_env-0).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/EnvironmentWorker(val_env-1).log
+[36m(EnvironmentWorker(val_env-1) pid=2353121, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}[32m [repeated 14x across cluster][0m
+[36m(EnvironmentWorker(val_env-1) pid=2353121, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}[32m [repeated 14x across cluster][0m
+[36m(EnvironmentWorker(val_env-0) pid=2352785, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}[32m [repeated 13x across cluster][0m
+[36m(EnvironmentWorker(val_env-1) pid=2353121, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}[32m [repeated 13x across cluster][0m
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:21] [checkpoint_manager.py (55)] [INFO] [actor_train-0 0 / 4][PID 2348781] checkpoint_config: {}
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:21] [megatron_strategy.py (63)] [INFO] [actor_train-0 0 / 4][PID 2348781] training_args: {'output_dir': './runs/tictactoe_selfplay_fix_lr2e6/20261024-003136', 'max_steps': 3200, 'num_train_epochs': 1.0, 'learning_rate': 2e-06, 'lr_scheduler_type': 'cosine_with_min_lr', 'weight_decay': 0.05, 'adam_beta1': 0.9, 'adam_beta2': 0.95, 'per_device_train_batch_size': 1, 'gradient_accumulation_steps': 8, 'seed': 42, 'data_seed': None, 'dataloader_num_workers': 0, 'fp16': False, 'bf16': True, 'tf32': None, 'warmup_ratio': 0.03, 'warmup_steps': 160, 'sequence_parallel': True, 'tensor_model_parallel_size': 4, 'pipeline_model_parallel_size': 1, 'expert_model_parallel_size': 1, 'use_distributed_optimizer': False, 'recompute_granularity': 'full', 'accumulate_allreduce_grads_in_fp32': True, 'check_for_nan_in_loss_and_grad': False, 'lr_scheduler_kwargs': {'min_lr': 2e-07}, 'max_grad_norm': 1.0}
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:21,487] [INFO] [mcore_adapter.training_args]: cuda_graph_scope before processing: full, type: <class 'str'>
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_train-0).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_train-3).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_train-2).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_train-1).log
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:21,995] [INFO] [mcore_adapter.initialize]: Initializing mpu on device cuda:0
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,003] [INFO] [mcore_adapter.initialize]: initialized tensor model parallel with size 4
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,003] [INFO] [mcore_adapter.initialize]: initialized pipeline model parallel with size 1
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,628] [INFO] [mcore_adapter.models.auto.modeling_auto]: Did not find /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/mca_config.json, loading HuggingFace config from /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,634] [INFO] [mcore_adapter.models.model_config]: Did not find /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/mca_config.json, loading HuggingFace config from /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,637] [WARNING] [mcore_adapter.models.converter.template]: key='rope_parameters' not exists in hf_config for get_hf_config_value
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:22,641] [WARNING] [mcore_adapter.models.model_config]: Non-interleaved pipeline parallelism does not support overlapping p2p communication!
+[36m(EnvironmentWorker(val_env-0) pid=2352785, ip=10.100.20.25)[0m Length reward scale: {'upper': 0.0, 'lower': 0.5, 'min_len': 11, 'max_len': 2048, 'coef': 1}[32m [repeated 9x across cluster][0m
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:23,050] [INFO] [mcore_adapter.models.model_factory]: number of parameters on (tensor, pipeline, expert) model parallel rank (0, 0, 0): 1005764096
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24,409] [INFO] [mcore_adapter.models.model_factory]: End loading, cost: 1.775s
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (308)] [INFO] [actor_train-0 0 / 4][PID 2348781] megatron optimizer: <megatron.core.optimizer.optimizer.Float16OptimizerWithFloat16Params object at 0x70c40c1ac520>
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (321)] [INFO] [actor_train-0 0 / 4][PID 2348781] max steps pipeline 3200
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (326)] [INFO] [actor_train-0 0 / 4][PID 2348781] max steps worker train 3200
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (353)] [INFO] [actor_train-0 0 / 4][PID 2348781] [DistributedDataParallel(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m   (module): McaGPTModel(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     (embedding): LanguageModelEmbedding(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m       (word_embeddings): VocabParallelEmbedding()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m       (embedding_dropout): Dropout(p=0.0, inplace=False)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     (rotary_pos_emb): RotaryEmbedding()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     (decoder): TransformerBlock(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m       (layers): ModuleList(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m         (0-35): 36 x TransformerLayer(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (input_layernorm): IdentityOp()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (self_attention): SelfAttention(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (core_attention): TEDotProductAttention(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m               (flash_attention): FlashAttention()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m               (fused_attention): FusedAttention()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m               (unfused_attention): UnfusedDotProductAttention(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m                 (scale_mask_softmax): FusedScaleMaskSoftmax()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m                 (attention_dropout): Dropout(p=0.0, inplace=False)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m               )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (linear_proj): TERowParallelLinear(in_features=1024, out_features=2560, bias=False, TP=4)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (linear_qkv): TELayerNormColumnParallelLinear(in_features=2560, out_features=1536, bias=False, TP=4)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (q_layernorm): RMSNorm()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (k_layernorm): RMSNorm()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (pre_cross_attn_layernorm): IdentityOp()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (cross_attention): IdentityOp()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (cross_attn_bda): IdentityFuncOp()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (pre_mlp_layernorm): IdentityOp()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           (mlp): MLP(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (linear_fc1): TELayerNormColumnParallelLinear(in_features=2560, out_features=4864, bias=False, TP=4)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m             (linear_fc2): TERowParallelLinear(in_features=2432, out_features=2560, bias=False, TP=4)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m           )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m         )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m       )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m       (final_layernorm): RMSNorm()
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m     (output_layer): ColumnParallelLinear(in_features=2560, out_features=151936, bias=False, TP=4)
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m   )
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m )]
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [base_worker.py (53)] [INFO] [actor_train-0 0 / 4][PID 2348781] actor_train-0 initialized
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:28 [__init__.py:239] Automatically detected platform cuda.
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21] [checkpoint_manager.py (55)] [INFO] [actor_train-1 1 / 4][PID 2348974] checkpoint_config: {}[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21] [megatron_strategy.py (63)] [INFO] [actor_train-1 1 / 4][PID 2348974] training_args: {'output_dir': './runs/tictactoe_selfplay_fix_lr2e6/20261024-003136', 'max_steps': 3200, 'num_train_epochs': 1.0, 'learning_rate': 2e-06, 'lr_scheduler_type': 'cosine_with_min_lr', 'weight_decay': 0.05, 'adam_beta1': 0.9, 'adam_beta2': 0.95, 'per_device_train_batch_size': 1, 'gradient_accumulation_steps': 8, 'seed': 42, 'data_seed': None, 'dataloader_num_workers': 0, 'fp16': False, 'bf16': True, 'tf32': None, 'warmup_ratio': 0.03, 'warmup_steps': 160, 'sequence_parallel': True, 'tensor_model_parallel_size': 4, 'pipeline_model_parallel_size': 1, 'expert_model_parallel_size': 1, 'use_distributed_optimizer': False, 'recompute_granularity': 'full', 'accumulate_allreduce_grads_in_fp32': True, 'check_for_nan_in_loss_and_grad': False, 'lr_scheduler_kwargs': {'min_lr': 2e-07}, 'max_grad_norm': 1.0}[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21,487] [INFO] [mcore_adapter.training_args]: cuda_graph_scope before processing: full, type: <class 'str'>[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21,958] [INFO] [mcore_adapter.initialize]: Initializing mpu on device cuda:0[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21,980] [INFO] [mcore_adapter.initialize]: initialized tensor model parallel with size 4[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:21,980] [INFO] [mcore_adapter.initialize]: initialized pipeline model parallel with size 1[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:22,662] [INFO] [mcore_adapter.models.auto.modeling_auto]: Did not find /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/mca_config.json, loading HuggingFace config from /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:22,664] [INFO] [mcore_adapter.models.model_config]: Did not find /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/mca_config.json, loading HuggingFace config from /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:22,667] [WARNING] [mcore_adapter.models.converter.template]: key='rope_parameters' not exists in hf_config for get_hf_config_value[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:22,669] [WARNING] [mcore_adapter.models.model_config]: Non-interleaved pipeline parallelism does not support overlapping p2p communication![32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:23,043] [INFO] [mcore_adapter.models.model_factory]: number of parameters on (tensor, pipeline, expert) model parallel rank (1, 0, 0): 1005764096[32m [repeated 3x across cluster][0m
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_infer-0).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_infer-1).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_infer-3).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(actor_infer-2).log
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:37:32] [vllm_strategy.py (76)] [INFO] [actor_infer-0 0 / 4][PID 2349331] vllm_config: {'gpu_memory_utilization': 0.8, 'block_size': 16, 'load_format': 'auto', 'model': '/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', 'dtype': 'bfloat16', 'enforce_eager': True, 'trust_remote_code': True, 'seed': 42, 'disable_custom_all_reduce': True, 'enable_prefix_caching': False}
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24,408] [INFO] [mcore_adapter.models.model_factory]: End loading, cost: 1.744s[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (308)] [INFO] [actor_train-1 1 / 4][PID 2348974] megatron optimizer: <megatron.core.optimizer.optimizer.Float16OptimizerWithFloat16Params object at 0x77e4a01753c0>[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (321)] [INFO] [actor_train-1 1 / 4][PID 2348974] max steps pipeline 3200[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (326)] [INFO] [actor_train-1 1 / 4][PID 2348974] max steps worker train 3200[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [megatron_strategy.py (353)] [INFO] [actor_train-1 1 / 4][PID 2348974] [DistributedDataParallel([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m   (module): McaGPTModel([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m     (embedding): LanguageModelEmbedding([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m       (word_embeddings): VocabParallelEmbedding()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m       (embedding_dropout): Dropout(p=0.0, inplace=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m   )[32m [repeated 27x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m     (rotary_pos_emb): RotaryEmbedding()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m     (decoder): TransformerBlock([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m       (layers): ModuleList([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m         (0-35): 36 x TransformerLayer([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (input_layernorm): IdentityOp()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (self_attention): SelfAttention([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (core_attention): TEDotProductAttention([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m               (flash_attention): FlashAttention()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m               (fused_attention): FusedAttention()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m               (unfused_attention): UnfusedDotProductAttention([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m                 (scale_mask_softmax): FusedScaleMaskSoftmax()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m                 (attention_dropout): Dropout(p=0.0, inplace=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (linear_proj): TERowParallelLinear(in_features=1024, out_features=2560, bias=False, TP=4)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (linear_qkv): TELayerNormColumnParallelLinear(in_features=2560, out_features=1536, bias=False, TP=4)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (q_layernorm): RMSNorm()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (k_layernorm): RMSNorm()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (pre_cross_attn_layernorm): IdentityOp()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (cross_attention): IdentityOp()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (cross_attn_bda): IdentityFuncOp()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (pre_mlp_layernorm): IdentityOp()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m           (mlp): MLP([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m             (linear_fc2): TERowParallelLinear(in_features=2432, out_features=2560, bias=False, TP=4)[32m [repeated 6x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m       (final_layernorm): RMSNorm()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m     (output_layer): ColumnParallelLinear(in_features=2560, out_features=151936, bias=False, TP=4)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m )][32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:37:24] [base_worker.py (53)] [INFO] [actor_train-1 1 / 4][PID 2348974] actor_train-1 initialized[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:689] This model supports multiple tasks: {'embed', 'reward', 'score', 'generate', 'classify'}. Defaulting to 'generate'.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:1901] Chunked prefill is enabled with max_num_batched_tokens=8192.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m Loading safetensors checkpoint shards:   0% Completed | 0/3 [00:00<?, ?it/s]
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/megatron/core/transformer/transformer_config.py:1705: UserWarning: full scope is deprecated. Use empty cuda_graph_scope to capture the whole layer.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m   warnings.warn([32m [repeated 7x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/transformer_engine/pytorch/module/base.py:804: UserWarning: To guarantee overlapping TP and SP collectives with the backwardGEMMs, set environment variable CUDA_DEVICE_MAX_CONNECTIONS = 1[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m Loading safetensors checkpoint shards:  33% Completed | 1/3 [00:00<00:01,  1.49it/s]
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m 
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:28 [__init__.py:239] Automatically detected platform cuda.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m [2026-10-24 00:37:32] [vllm_strategy.py (76)] [INFO] [actor_infer-2 2 / 4][PID 2349454] vllm_config: {'gpu_memory_utilization': 0.8, 'block_size': 16, 'load_format': 'auto', 'model': '/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', 'dtype': 'bfloat16', 'enforce_eager': True, 'trust_remote_code': True, 'seed': 42, 'disable_custom_all_reduce': True, 'enable_prefix_caching': False}[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-1) pid=2349453, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:689] This model supports multiple tasks: {'classify', 'score', 'reward', 'embed', 'generate'}. Defaulting to 'generate'.
+[36m(ActorWorker(actor_infer-1) pid=2349453, ip=10.100.20.25)[0m WARNING 10-24 00:37:46 [cuda.py:96] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+[36m(ActorWorker(actor_infer-1) pid=2349453, ip=10.100.20.25)[0m [2026-10-24 00:37:46] [llm_engine.py (179)] [INFO] [actor_infer-1 1 / 4][PID 2349453] Using executor_class: <class 'vllm.v1.executor.abstract.UniProcExecutor'>
+[36m(ActorWorker(actor_infer-1) pid=2349453, ip=10.100.20.25)[0m [2026-10-24 00:37:46] [llm_engine.py (180)] [INFO] [actor_infer-1 1 / 4][PID 2349453] Using worker cls: roll.third_party.vllm.vllm_0_8_4.v1.worker.Worker084
+[36m(ActorWorker(actor_infer-3) pid=2349455, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:689] This model supports multiple tasks: {'generate', 'score', 'reward', 'embed', 'classify'}. Defaulting to 'generate'.
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:689] This model supports multiple tasks: {'reward', 'score', 'generate', 'embed', 'classify'}. Defaulting to 'generate'.
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:46 [config.py:1901] Chunked prefill is enabled with max_num_batched_tokens=8192.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:53 [__init__.py:239] Automatically detected platform cuda.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m WARNING 10-24 00:37:46 [cuda.py:96] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:37:46] [llm_engine.py (179)] [INFO] [actor_infer-0 0 / 4][PID 2349331] Using executor_class: <class 'vllm.v1.executor.abstract.UniProcExecutor'>[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:37:46] [llm_engine.py (180)] [INFO] [actor_infer-0 0 / 4][PID 2349331] Using worker cls: roll.third_party.vllm.vllm_0_8_4.v1.worker.Worker084[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:53 [__init__.py:239] Automatically detected platform cuda.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:56 [core.py:61] Initializing a V1 LLM engine (v0.8.4) with config: model='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', speculative_config=None, tokenizer='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=40960, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=True, quantization=None, enforce_eager=True, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='auto', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=42, served_model_name=/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=True, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[],"max_capture_size":0}
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m add logger: log_rank_actor_infer-0_0_4
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_infer-0_0_4.log
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m WARNING 10-24 00:37:59 [utils.py:2444] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <roll.third_party.vllm.vllm_0_8_4.v1.worker.Worker084 object at 0x7dc9c4a40910>
+[36m(ActorWorker(actor_infer-3) pid=2349455, ip=10.100.20.25)[0m INFO 10-24 00:37:53 [__init__.py:239] Automatically detected platform cuda.[32m [repeated 2x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [parallel_state.py:959] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [cuda.py:221] Using Flash Attention backend on V1 engine.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [gpu_model_runner.py:1276] Starting to load model /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/...
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:00 [topk_topp_sampler.py:59] Using FlashInfer for top-p & top-k sampling.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:01 [loader.py:458] Loading weights took 1.62 seconds
+[36m(ActorWorker(actor_infer-3) pid=2349455, ip=10.100.20.25)[0m 
+[36m(ActorWorker(actor_infer-1) pid=2349453, ip=10.100.20.25)[0m 
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m 
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m Loading safetensors checkpoint shards:   0% Completed | 0/3 [00:00<?, ?it/s][32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m Loading safetensors checkpoint shards: 100% Completed | 3/3 [00:01<00:00,  1.78it/s][32m [repeated 14x across cluster][0m
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m Loading checkpoint shards:  33%|███▎      | 1/3 [00:00<00:01,  1.33it/s]
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:56 [core.py:61] Initializing a V1 LLM engine (v0.8.4) with config: model='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', speculative_config=None, tokenizer='/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=40960, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=True, quantization=None, enforce_eager=True, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='auto', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=42, served_model_name=/datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=True, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[],"max_capture_size":0}[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:01 [gpu_model_runner.py:1291] Model loading took 7.5552 GiB and 1.763611 seconds
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [kv_cache_utils.py:634] GPU KV cache size: 190,288 tokens
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [kv_cache_utils.py:637] Maximum concurrency for 40,960 tokens per request: 4.65x
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [core.py:163] init engine (profile, create kv cache, warmup model) took 0.84 seconds
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [core_client.py:435] Core engine process 0 ready.
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:38:02] [vllm_strategy.py (94)] [INFO] [actor_infer-0 0 / 4][PID 2349331] add [AddedToken("<|endoftext|>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True)] to additional_special_tokens: ['<|im_start|>', '<|im_end|>', '<|object_ref_start|>', '<|object_ref_end|>', '<|box_start|>', '<|box_end|>', '<|quad_start|>', '<|quad_end|>', '<|vision_start|>', '<|vision_end|>', '<|vision_pad|>', '<|image_pad|>', '<|video_pad|>', '<|endoftext|>']
+[36m(ActorWorker(actor_infer-3) pid=2349455, ip=10.100.20.25)[0m [2026-10-24 00:38:02] [base_worker.py (53)] [INFO] [actor_infer-3 3 / 4][PID 2349455] actor_infer-3 initialized
+[36m(ActorWorker(actor_infer-3) pid=2349455, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [block_pool.py:264] Successfully reset prefix cache
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m INFO 10-24 00:38:06 [gpu_worker.py:81] Sleep mode freed 34.25 GiB memory, 1.22 GiB memory is still in use.
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m add logger: log_rank_actor_infer-2_2_4[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m Created or verified log directory: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m Added logging to file: /scratch/workspace/eunbiyoon_umass_edu-paper/megatron/runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/log_rank_actor_infer-2_2_4.log[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m WARNING 10-24 00:37:59 [utils.py:2444] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <roll.third_party.vllm.vllm_0_8_4.v1.worker.Worker084 object at 0x76706a3e4670>[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [parallel_state.py:959] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [cuda.py:221] Using Flash Attention backend on V1 engine.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [gpu_model_runner.py:1276] Starting to load model /datasets/ai/qwen3/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c/...[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:37:59 [topk_topp_sampler.py:59] Using FlashInfer for top-p & top-k sampling.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:01 [loader.py:458] Loading weights took 1.69 seconds[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m [2026-10-24 00:38:09] [model_providers.py (395)] [INFO] [reference-0 0 / 4][PID 2349808] init_kwargs: {'torch_dtype': torch.bfloat16, 'trust_remote_code': True, 'low_cpu_mem_usage': True, 'device_map': 'balanced'}
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:01 [gpu_model_runner.py:1291] Model loading took 7.5552 GiB and 1.827800 seconds[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [kv_cache_utils.py:634] GPU KV cache size: 190,288 tokens[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [kv_cache_utils.py:637] Maximum concurrency for 40,960 tokens per request: 4.65x[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [core.py:163] init engine (profile, create kv cache, warmup model) took 0.86 seconds[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [core_client.py:435] Core engine process 0 ready.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m [2026-10-24 00:38:02] [vllm_strategy.py (94)] [INFO] [actor_infer-2 2 / 4][PID 2349454] add [AddedToken("<|endoftext|>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True)] to additional_special_tokens: ['<|im_start|>', '<|im_end|>', '<|object_ref_start|>', '<|object_ref_end|>', '<|box_start|>', '<|box_end|>', '<|quad_start|>', '<|quad_end|>', '<|vision_start|>', '<|vision_end|>', '<|vision_pad|>', '<|image_pad|>', '<|video_pad|>', '<|endoftext|>'][32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m [2026-10-24 00:38:02] [base_worker.py (53)] [INFO] [actor_infer-2 2 / 4][PID 2349454] actor_infer-2 initialized[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:02 [block_pool.py:264] Successfully reset prefix cache[32m [repeated 3x across cluster][0m
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(reference-0).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(reference-3).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(reference-2).log
+log redirect to filename: ./runs/tictactoe_selfplay_fix_lr2e6/20261024-003136/logs/ActorWorker(reference-1).log
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m Loading checkpoint shards:  67%|██████▋   | 2/3 [00:01<00:00,  1.34it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:01<00:00,  1.97it/s]
+[36m(ActorWorker(reference-3) pid=2349954, ip=10.100.20.25)[0m Loading checkpoint shards: 100%|██████████| 3/3 [00:01<00:00,  2.18it/s]
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m [2026-10-24 00:38:10] [hf_strategy.py (47)] [INFO] [reference-0 0 / 4][PID 2349808] Qwen3ForCausalLM(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m   (model): Qwen3Model(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m     (embed_tokens): Embedding(151936, 2560)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m     (layers): ModuleList(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m       (0-35): 36 x Qwen3DecoderLayer(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         (self_attn): Qwen3Attention(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (q_proj): Linear(in_features=2560, out_features=4096, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (k_proj): Linear(in_features=2560, out_features=1024, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (v_proj): Linear(in_features=2560, out_features=1024, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (o_proj): Linear(in_features=4096, out_features=2560, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         )
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         (mlp): Qwen3MLP(
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (gate_proj): Linear(in_features=2560, out_features=9728, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (up_proj): Linear(in_features=2560, out_features=9728, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (down_proj): Linear(in_features=9728, out_features=2560, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m           (act_fn): SiLU()
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         )
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         (input_layernorm): Qwen3RMSNorm((2560,), eps=1e-06)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m         (post_attention_layernorm): Qwen3RMSNorm((2560,), eps=1e-06)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m       )
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m     )
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m     (norm): Qwen3RMSNorm((2560,), eps=1e-06)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m     (rotary_emb): Qwen3RotaryEmbedding()
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m   )
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m   (lm_head): Linear(in_features=2560, out_features=151936, bias=False)
+[36m(ActorWorker(reference-0) pid=2349808, ip=10.100.20.25)[0m )
+broadcast_comm_pan: {"0": {"0": [{"rank": 1, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 1}}], "1": [{"rank": 0, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 0}}], "2": [{"rank": 3, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 3}}], "3": [{"rank": 2, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 2}}]}}
+p2p_comm_plan: {}
+pp_rank: 0 pp_comm_plan_args: {"0": {"group_name": "model_update_actor_train_0_to_actor_infer_(1,0)", "master_addr": "10.100.20.25", "master_port": 33111, "tgt_devices": [{"rank": 1, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 1}}], "src_pp_rank": 0, "src_rank": 0}, "1": {"group_name": "model_update_actor_train_1_to_actor_infer_(0,0)", "master_addr": "10.100.20.25", "master_port": 42569, "tgt_devices": [{"rank": 0, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 0}}], "src_pp_rank": 0, "src_rank": 1}, "2": {"group_name": "model_update_actor_train_2_to_actor_infer_(3,0)", "master_addr": "10.100.20.25", "master_port": 39123, "tgt_devices": [{"rank": 3, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 3}}], "src_pp_rank": 0, "src_rank": 2}, "3": {"group_name": "model_update_actor_train_3_to_actor_infer_(2,0)", "master_addr": "10.100.20.25", "master_port": 40407, "tgt_devices": [{"rank": 2, "device": {"rank": 0, "node_rank": 0, "gpu_rank": 2}}], "src_pp_rank": 0, "src_rank": 3}}
+[2026-10-24 00:38:16] [agentic_pipeline.py (118)] [INFO] [DRIVER 0 / 1][PID 2345257] pipeline rollout global step 0 start...
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/cuda/memory.py:391: FutureWarning: torch.cuda.reset_max_memory_allocated now calls torch.cuda.reset_peak_memory_stats, which resets /all/ peak memory stats.
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m   warnings.warn(
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/cuda/memory.py:417: FutureWarning: torch.cuda.reset_max_memory_cached now calls torch.cuda.reset_peak_memory_stats, which resets /all/ peak memory stats.
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m   warnings.warn(
+[36m(ActorWorker(reference-3) pid=2349954, ip=10.100.20.25)[0m Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s][32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m Loading checkpoint shards:  67%|██████▋   | 2/3 [00:01<00:00,  1.25it/s][32m [repeated 5x across cluster][0m
+[36m(ActorWorker(reference-1) pid=2349952, ip=10.100.20.25)[0m Loading checkpoint shards:  67%|██████▋   | 2/3 [00:01<00:00,  1.37it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:01<00:00,  2.01it/s]
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m Loading checkpoint shards: 100%|██████████| 3/3 [00:01<00:00,  1.84it/s]
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:38:16] [strategy.py (171)] [INFO] [actor_train-0 0 / 4][PID 2348781] warmup setup_collective_group: model_update_actor_train_0_to_actor_infer_(1,0) rank: 0 world_size: 2
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m INFO 10-24 00:38:06 [gpu_worker.py:81] Sleep mode freed 34.25 GiB memory, 1.22 GiB memory is still in use.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-1) pid=2349952, ip=10.100.20.25)[0m [2026-10-24 00:38:09] [model_providers.py (395)] [INFO] [reference-1 1 / 4][PID 2349952] init_kwargs: {'torch_dtype': torch.bfloat16, 'trust_remote_code': True, 'low_cpu_mem_usage': True, 'device_map': 'balanced'}[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m [2026-10-24 00:38:10] [base_worker.py (53)] [INFO] [reference-2 2 / 4][PID 2349953] reference-2 initialized[32m [repeated 4x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m [2026-10-24 00:38:10] [hf_strategy.py (47)] [INFO] [reference-2 2 / 4][PID 2349953] Qwen3ForCausalLM([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m   (model): Qwen3Model([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m     (embed_tokens): Embedding(151936, 2560)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m     (layers): ModuleList([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m       (0-35): 36 x Qwen3DecoderLayer([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m         (self_attn): Qwen3Attention([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (q_proj): Linear(in_features=2560, out_features=4096, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (k_proj): Linear(in_features=2560, out_features=1024, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (v_proj): Linear(in_features=2560, out_features=1024, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (o_proj): Linear(in_features=4096, out_features=2560, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (q_norm): Qwen3RMSNorm((128,), eps=1e-06)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (k_norm): Qwen3RMSNorm((128,), eps=1e-06)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m )[32m [repeated 18x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m         (mlp): Qwen3MLP([32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (gate_proj): Linear(in_features=2560, out_features=9728, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (up_proj): Linear(in_features=2560, out_features=9728, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (down_proj): Linear(in_features=9728, out_features=2560, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m           (act_fn): SiLU()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m         (input_layernorm): Qwen3RMSNorm((2560,), eps=1e-06)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m         (post_attention_layernorm): Qwen3RMSNorm((2560,), eps=1e-06)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m     (norm): Qwen3RMSNorm((2560,), eps=1e-06)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m     (rotary_emb): Qwen3RotaryEmbedding()[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(reference-2) pid=2349953, ip=10.100.20.25)[0m   (lm_head): Linear(in_features=2560, out_features=151936, bias=False)[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-0) pid=2349331, ip=10.100.20.25)[0m [2026-10-24 00:38:16] [worker_helper.py (73)] [INFO] [actor_infer-0 0 / 4][PID 2355548] warmup setup_collective_group: model_update_actor_train_1_to_actor_infer_(0,0) rank: 1 world_size: 2
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:38:17] [context_managers.py (37)] [INFO] [actor_train-0 0 / 4][PID 2348781] actor_train/model_update_start_offload, memory allocated (GB): 1.9073486328125e-06, memory reserved (GB): 0.001953125, memory max reserved (GB): 0.001953125, rss (GB): 7.54498291015625
+Traceback (most recent call last):
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/examples/start_agentic_pipeline.py", line 35, in <module>
+    main()
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/examples/start_agentic_pipeline.py", line 31, in main
+    pipeline.run()
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/pipeline/agentic/agentic_pipeline.py", line 125, in run
+    model_update_metrics: Dict = self.model_update(global_step)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/pipeline/base_pipeline.py", line 68, in model_update
+    metrics.update(model_update_group.model_update(global_step))
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/distributed/executor/model_update_group.py", line 152, in model_update
+    data = ray.get(refs)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/ray/_private/worker.py", line 2822, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/ray/_private/worker.py", line 930, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RecursionError): [36mray::ActorWorker.start_model_update()[39m (pid=2348974, ip=10.100.20.25, actor_id=2d89af35b5ab65f61a367eb601000000, repr=ActorWorker(actor_train-1))
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/distributed/executor/worker.py", line 177, in start_model_update
+    exec_metrics: Dict = self.strategy.model_update(*args, **kwargs)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/distributed/strategy/megatron_strategy.py", line 416, in model_update
+    for meta_infos, buffer in self.model.all_gather_weights_as_hf_bucket(
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 36, in generator_context
+    response = gen.send(None)
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 84, in _all_gather_weights_as_hf_bucket
+    for vp_stage, mca_name, weight in _mca_named_params(converter, models):
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 62, in _mca_named_params
+    for vp_stage, mca_name, weight in _mca_named_params(converter, models):
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 62, in _mca_named_params
+    for vp_stage, mca_name, weight in _mca_named_params(converter, models):
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 62, in _mca_named_params
+    for vp_stage, mca_name, weight in _mca_named_params(converter, models):
+  [Previous line repeated 983 more times]
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 61, in _mca_named_params
+    if not any(isinstance(model, PeftModel) for model in models):
+  File "/scratch/workspace/eunbiyoon_umass_edu-paper/megatron/roll/third_party/megatron/mcore_adapter_weight_sync_patch.py", line 61, in <genexpr>
+    if not any(isinstance(model, PeftModel) for model in models):
+RecursionError: maximum recursion depth exceeded while calling a Python object
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/cuda/memory.py:391: FutureWarning: torch.cuda.reset_max_memory_allocated now calls torch.cuda.reset_peak_memory_stats, which resets /all/ peak memory stats.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m   warnings.warn([32m [repeated 6x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m /scratch/workspace/eunbiyoon_umass_edu-paper/eunbiyoon_umass_edu/.conda/envs/mg/lib/python3.10/site-packages/torch/cuda/memory.py:417: FutureWarning: torch.cuda.reset_max_memory_cached now calls torch.cuda.reset_peak_memory_stats, which resets /all/ peak memory stats.[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m [2026-10-24 00:38:17] [context_managers.py (37)] [INFO] [actor_train-0 0 / 4][PID 2348781] actor_train/model_update_start_onload, memory allocated (GB): 1.8733835220336914, memory reserved (GB): 1.876953125, memory max reserved (GB): 1.876953125, rss (GB): 7.545082092285156
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m Elapsed time: 0.3806 seconds
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m Elapsed time: 0.0019 seconds
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m Elapsed time: 0.0019 seconds
+[36m(ActorWorker(actor_train-0) pid=2348781, ip=10.100.20.25)[0m Elapsed time: 0.3826 seconds
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:38:16] [strategy.py (171)] [INFO] [actor_train-1 1 / 4][PID 2348974] warmup setup_collective_group: model_update_actor_train_1_to_actor_infer_(0,0) rank: 0 world_size: 2[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_infer-2) pid=2349454, ip=10.100.20.25)[0m [2026-10-24 00:38:16] [worker_helper.py (73)] [INFO] [actor_infer-2 2 / 4][PID 2355536] warmup setup_collective_group: model_update_actor_train_3_to_actor_infer_(2,0) rank: 1 world_size: 2[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:38:17] [context_managers.py (37)] [INFO] [actor_train-1 1 / 4][PID 2348974] actor_train/model_update_start_offload, memory allocated (GB): 1.9073486328125e-06, memory reserved (GB): 0.001953125, memory max reserved (GB): 0.001953125, rss (GB): 7.564105987548828[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m [2026-10-24 00:38:17] [context_managers.py (37)] [INFO] [actor_train-1 1 / 4][PID 2348974] actor_train/model_update_start_onload, memory allocated (GB): 1.8733835220336914, memory reserved (GB): 1.876953125, memory max reserved (GB): 1.876953125, rss (GB): 7.564186096191406[32m [repeated 3x across cluster][0m
+[36m(ActorWorker(actor_train-1) pid=2348974, ip=10.100.20.25)[0m Elapsed time: 0.3231 seconds[32m [repeated 12x across cluster][0m
+[2026-10-24 00:38:25] [log_monitor.py (225)] [INFO] [DRIVER 0 / 1][PID 2345257] Execute ray.shutdown before the program exits...

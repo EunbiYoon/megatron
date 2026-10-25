@@ -90,6 +90,37 @@ def freeze_model(model, model_args: "ModelArguments"):
             param.requires_grad_(False)
 
 
+def setup_mca_lora(model, model_args: "ModelArguments"):
+    """Wrap one megatron model chunk with mcore_adapter's tensor-parallel LoRA layers (peft)."""
+    from peft import LoraConfig, get_peft_model
+    from mcore_adapter.adapters import apply_megatron_lora, find_all_linear_modules, set_linear_is_expert
+
+    apply_megatron_lora()
+    set_linear_is_expert(model)
+    # base weights are frozen; with full recompute the checkpointed blocks need an input that
+    # requires grad, otherwise no grad flows back to the LoRA weights
+    model.enable_input_require_grads()
+
+    target_modules = [t.strip() for t in model_args.lora_target.split(",") if t.strip()]
+    if "all-linear" in target_modules:
+        target_modules.remove("all-linear")
+        target_modules += [n for n in find_all_linear_modules(model) if not n.endswith("output_layer")]
+    lora_config = LoraConfig(
+        r=model_args.lora_rank,
+        lora_alpha=model_args.lora_alpha or model_args.lora_rank * 2,
+        lora_dropout=model_args.lora_dropout,
+        target_modules=sorted(set(target_modules)),
+    )
+    model = get_peft_model(model, lora_config, autocast_adapter_dtype=False)
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
+    logger.info(
+        f"LoRA applied: targets={lora_config.target_modules} r={lora_config.r} alpha={lora_config.lora_alpha} "
+        f"trainable params (this rank)={trainable} / {total} ({100 * trainable / total:.3f}%)"
+    )
+    return model
+
+
 def load_model(
     model_args: "ModelArguments",
     is_trainable: Optional[bool] = False,
@@ -345,6 +376,8 @@ def default_actor_model_provider(
                 param.requires_grad = False
         freeze_model(model, model_args)
         patch_model(model, config, use_mcore=True)
+        if is_trainable and model_args.lora_target is not None:
+            model.models = [setup_mca_lora(m, model_args) for m in model.models]
     else:
         # hf
         init_kwargs = {

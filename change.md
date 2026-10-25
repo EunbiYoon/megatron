@@ -226,3 +226,37 @@ m1b 결과(LoRA + lr 1e-6, min_lr 없음)를 보면 val 승률이 거의 안 변
 - `agentic_val_tictactoe_selfplay_opt3.yaml`(lr 2e-6, min_lr 2e-7) / `_opt4.yaml`(lr 3e-6, min_lr 3e-7). opt1 yaml 기반에서 lr, min_lr, **`warmup_steps: 10 → 320`**(optimizer step 단위라 10은 step 0 안에서 끝났음; 320 = pipeline ~10 step)만 변경.
 - `save_steps`는 10으로 줄이려다 **20 유지**: 체크포인트 1개 = rank당 14G × 4 ≈ 56G, run 하나 ≈ 590G(m1b 실측). ROLL에 오래된 체크포인트 자동 삭제 옵션이 없고 `/scratch` 사용률 88%.
 - 새 run 스크립트(opt3/opt4)에만 `set -o pipefail` 추가 — `python ... | tee`의 종료코드가 tee로 덮여서 크래시가 COMPLETED로 찍히던 문제 해결.
+
+### 2026-10-22: fix_lr1e6 / fix_lr2e6 재제출
+- 기존 `ttt-fix-1e-6` 65901315 / `ttt-fix-2e-6` 65901316 (10/20 제출, `ReqNodeNotAvail`로 계속 PENDING) `scancel` → 재제출 **`ttt-fix-1e-6` 65968557**, **`ttt-fix-2e-6` 65968558** (sbatch 스크립트 변경 없음, L40S 4장 1노드, 14일).
+- fix yaml(`agentic_val_tictactoe_selfplay_fix_lr{1,2}e6.yaml`)은 opt 대비 LoRA 제거(full FT), `per_device 1 × grad_acc 8`, `warmup_steps 160`, train/val `env_groups 64`, `val_batch_size 64`, `eval_steps 10`.
+- 참고: 같은 날 interactive(uri-gpu011, 65959656)에서 fix_lr1e6을 수동 실행했으나 step 0 rollout 중 할당 종료로 중단 (`runs/tictactoe_selfplay_fix_lr1e6/20261022-123114`, 결과 없음).
+- 확인(2026-10-22): **이 ROLL 코드에는 LoRA 학습 경로가 없음** — `roll/`, `mcore_adapter/`에서 `lora_target`/`lora_rank`를 읽는 곳이 없고(vllm/sglang 서드파티만 `lora` 언급), yaml의 `lora_*` 키는 조용히 버려짐. opt2 run과 fix run 모두 TP rank당 파라미터 수 1,005,764,096(≈4B/4, 전체 모델)로 동일 → **opt1~4, m1b 포함 이전 "LoRA" run들도 실제로는 full fine-tuning**이었음. (10/06의 "LoRA인데 final_layernorm이 NaN" 의문, rank당 14G 체크포인트(=full optimizer state 크기)도 이걸로 설명됨.)
+- interactive 수동 실행이 step 0에서 멈춘 원인(추정): 할당 65959656이 `cpu=1`(sbatch는 `--cpus-per-task=32`). vLLM 4개·train/ref 워커·env 워커·RequestScheduler가 CPU 1개를 나눠 써서 rollout이 사실상 진행 안 됨. 이전 run은 step 0 rollout ~3분, 시작~step 0 완료 ~38분이었는데 이번엔 rollout 시작(12:46) 후 1시간 40분 동안 진척 없음. 에러 로그 없음.
+
+### 2026-10-22: Megatron actor_train에 LoRA 실제 연결 + fix LoRA 버전 2개 제출
+- 설치된 `mcore_adapter`(0.10)에 TP 지원 LoRA 레이어(`mcore_adapter/adapters/lora_layer.py`, peft 0.12 기반)가 있는데 ROLL이 연결을 안 해서 `lora_*`가 무시되던 것. 연결한 곳:
+  1. `roll/configs/model_args.py`: `lora_target`(쉼표 구분 or `all-linear`), `lora_rank`(기본 8), `lora_alpha`(기본 2×rank), `lora_dropout` 필드 추가.
+  2. `roll/models/model_providers.py`: `setup_mca_lora()` 추가. megatron + `is_trainable` + `lora_target` 있을 때만 각 model chunk를 `apply_megatron_lora()` → `get_peft_model()`로 감쌈 (`all-linear` = linear_qkv/linear_proj/linear_fc1/linear_fc2, output_layer 제외). full recompute에서 LoRA로 grad가 흐르도록 `enable_input_require_grads()`. 로그에 `LoRA applied: ... trainable params` 출력. reference(hf_infer)와 actor_infer(vLLM)는 영향 없음.
+  3. `roll/third_party/megatron/mcore_adapter_weight_sync_patch.py`: PeftModel이면 vLLM에 보낼 때 base weight + LoRA delta(B@A×scaling, TP shard 단위)를 **out-of-place**로 더해서 원래 이름으로 전송. (mcore_adapter 기본 iterator는 adapter weight만 내보내서 vLLM이 못 받음. 매 step merge/unmerge는 bf16 base weight가 누적 오차로 drift해서 안 씀.)
+  4. `roll/distributed/strategy/megatron_strategy.py` `save_checkpoint`: PeftModel이면 adapter만 `<ckpt>/default/`에 mcore 형식으로 저장 (`PeftModel.save_pretrained`는 TP rank들이 같은 파일을 덮어씀). resume(`load_checkpoint`)은 LoRA 미지원 상태 — 현재 `resume_from_checkpoint: false`라 문제없음.
+- 신규: `agentic_val_tictactoe_selfplay_fix_lora_lr{1e6,2e6}.yaml` (= fix yaml + `actor_train.model_args`에 `lora_target: all-linear, lora_rank: 32, lora_alpha: 32`), run 스크립트(`set -o pipefail` 추가), `sbatch_fix_lora_lr{1e6,2e6}_gpu.sh`.
+- 제출: **`ttt-lora-1e-6` 65970209**, **`ttt-lora-2e-6` 65970210** (로그 `slurm_logs/ttt-lora-*-<jobid>.out`, 출력 `runs/tictactoe_selfplay_fix_lora_lr*/`). full-FT fix job 65968557/65968558은 그대로 유지.
+- GPU에서 아직 한 번도 안 돌려본 코드 → 시작되면 확인할 것: (a) actor_train 로그의 `LoRA applied` / trainable 비율(~1% 미만이어야), (b) step 0 model_update 에러 없는지, (c) step 1부터 `actor/approxkl`이 0이 아닌지(=LoRA가 실제로 학습되고 vLLM에 반영되는지).
+
+### 2026-10-22: LoRA lr 1e-5, L40S 2장 버전 추가
+- `agentic_val_tictactoe_selfplay_fix_lora_lr1e5_2gpu.yaml` = `fix_lora_lr1e6` 기반, `learning_rate 1e-5`/`min_lr 1e-6`, `num_gpus_per_node: 2`, `device_mapping: list(range(0,2))`(train/infer/ref), `tensor_model_parallel_size: 2`. DP=1 그대로라 배치/optimizer step 수는 4장 run과 동일(GPU 수만 다름).
+- sbatch `sbatch_fix_lora_lr1e5_2gpu.sh`: `--gres=gpu:l40s:2 --cpus-per-task=16 --mem=128G`.
+- 메모리 추정: 이전 full-FT TP=4·micro batch 2 run의 actor_train 최대 reserved 39.3G. LoRA라 optimizer/grad가 거의 없지만 TP=2라 activation·logits가 GPU당 2배 → 빠듯할 수 있음(OOM이면 step 0 학습 중에 바로 죽음). vLLM 인스턴스도 4→2개라 rollout 약 2배 느림 예상(4장 기준 step당 ~33분 → ~1시간, 200 step ≈ 9일, 14일 제한 안).
+- 같은 날: 1e-5 2장 run을 `gpu-preempt`로 이동. `gpu` job 65970476 `scancel` → **`ttt-lora-1e-5-2g-p` 65971222** (`sbatch_fix_lora_lr1e5_2gpu_preempt.sh`, `--open-mode=append`). gpu-preempt는 `PreemptMode=REQUEUE`인데 LoRA resume이 없어서 선점되면 step 0부터 새 run 폴더로 다시 시작함.
+- 2026-10-23: 65971222(gpu-preempt, uri-gpu013) 두 번 선점됨 — 1차 10/22 18:55~21:11(step 1까지, `runs/.../20261022-185607`), 2차 10/23 06:33~13:17(step 6까지, `runs/.../20261023-063331`). 매번 step 0부터 재시작. 지금 다시 PENDING.
+  - **LoRA 코드 GPU 검증 완료**: `trainable params (this rank)=34,504,704 / 2,045,836,800 (1.69%)`, model_update/OOM 에러 없음, actor_train 최대 reserved 30.5G(2장 TP=2로도 충분), step당 ~54분.
+  - 학습 반영 확인: `actor/kl_loss` 0.0019→0.0044 증가(ref와 멀어짐), `approxkl` ~0.0007(0 아님), 후공 `lose_for_wrong_format` 0.51→0.14. `grad_norm` ~0.17(LoRA 파라미터만이라 full-FT의 2~20보다 작은 게 정상). val은 `eval_steps: 10`이라 step 10 전에 끊겨서 아직 없음.
+- 2026-10-23: 1e-5 2장 run은 사용자가 preempt(65971222) → `gpu` 파티션 65995281로 옮겼었음. step 50까지만 볼 거라서 `sbatch_fix_lora_lr1e5_2gpu.sh`의 `--time` 14일 → **2-06:00:00**(시작 ~1h + 50 step × ~55분 실측 + 여유)로 줄이고 65995281 취소 → **65995405** 재제출. `max_steps: 200`은 그대로 둠(cosine lr 스케줄을 4장 run들과 똑같이 맞추려고). step 50 근처에서 TIMEOUT으로 끝나는 게 정상이고, 체크포인트는 step 20/40에 저장됨.
+- 2026-10-23: LoRA 4장 run도 step 50까지만 → `sbatch_fix_lora_lr{1e6,2e6}_gpu.sh` `--time` 14일 → **1-12:00:00**(4장 LoRA step당 ~33분은 추정치라 여유 둠). 65970209/65970210 취소 → **`ttt-lora-1e-6` 65995438**, **`ttt-lora-2e-6` 65995439**. `max_steps: 200` 유지(lr 스케줄 동일). full-FT fix(65968557/58)는 14일 그대로.
+
+### 2026-10-25: full-FT fix run(65968557/65968558) 즉시 종료 원인 + 수정
+- 증상: `ttt-fix-1e-6`(10분), `ttt-fix-2e-6`(7분) 둘 다 step 0 첫 model_update에서 `RecursionError: maximum recursion depth exceeded` → ray.shutdown. sacct는 exit 0(COMPLETED)으로 찍혀서 실패처럼 안 보였음.
+- 원인: 10-22 LoRA 지원 추가 때 `roll/third_party/megatron/mcore_adapter_weight_sync_patch.py`의 `_mca_named_params()`에서 PeftModel이 아닌 경우(=full-FT)의 분기가 원래 `converter._mca_named_params_with_vp_stage(models)` 대신 **자기 자신을 호출**하게 잘못 작성됨. LoRA run은 모든 chunk가 PeftModel이라 이 분기를 안 타서 문제 없었음.
+- 수정: 해당 분기를 `for _adapter_name, vp_stage, mca_name, weight in converter._mca_named_params_with_vp_stage(models): yield vp_stage, mca_name, weight`로 복구. 실행 중인 LoRA job(65995405)은 이미 모듈을 로드했고 LoRA 분기만 써서 영향 없음.
+- fix full-FT 2개는 아직 재제출 안 함.

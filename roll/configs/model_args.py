@@ -57,6 +57,16 @@ class ModelArguments:
             "help": "Prefix of frozen modules for partial-parameter (freeze) fine-tuning. Use commas to separate multiple modules."
         },
     )
+    lora_target: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Comma-separated LoRA target module names, or 'all-linear'. None disables LoRA. "
+            "Only applied to trainable megatron models (actor_train)."
+        },
+    )
+    lora_rank: int = field(default=8, metadata={"help": "LoRA rank."})
+    lora_alpha: Optional[int] = field(default=None, metadata={"help": "LoRA alpha. Defaults to 2 * lora_rank."})
+    lora_dropout: float = field(default=0.0, metadata={"help": "LoRA dropout."})
 
     def __post_init__(self):
         dtype_mapping = {

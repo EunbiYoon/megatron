@@ -18,15 +18,61 @@ so those ranks never yielded a bucket and thus never called their own `collectiv
 leaving their paired actor_infer targets waiting on a NCCL broadcast that would never arrive
 (30-minute NCCL watchdog timeout). `all_gather_tensors` gives every rank the merged result so
 every rank yields buckets and performs its own broadcast.
+
+LoRA: for a PeftModel chunk, mcore_adapter's `_mca_named_params_with_vp_stage` yields only the
+adapter weights, which the inference engine can't load. Instead we yield the base weights with
+each LoRA delta (B @ A * scaling, on this TP rank's shard) added out of place, under the
+plain (non-`base_layer`) mca names. Merging in place and unmerging every model_update would
+slowly drift the bf16 base weights.
 """
+import torch
 import torch.distributed as dist
 from megatron.core import mpu
+from peft import PeftModel
+
+from mcore_adapter.adapters.lora_layer import LoraParallelLinear
 
 from mcore_adapter.models.converter.convert_utils import SendBucketManager, all_gather_tensors
 from mcore_adapter.models.converter.model_converter import ModelConverter
 from mcore_adapter.models.model_factory import VirtualModels
 
 
+def _merged_lora_state_dict(model: "PeftModel"):
+    inner = model.base_model.model
+    lora_modules = {name: m for name, m in inner.named_modules() if isinstance(m, LoraParallelLinear)}
+    state_dict = {}
+    for name, weight in inner.state_dict_for_save_checkpoint().items():
+        if "lora_" in name:
+            continue
+        if ".base_layer." in name:
+            prefix, suffix = name.split(".base_layer.", 1)
+            name = f"{prefix}.{suffix}"
+            module = lora_modules.get(prefix)
+            if suffix == "weight" and module is not None and not module.merged:
+                for adapter in module.active_adapters:
+                    if adapter in module.lora_A.keys():
+                        delta = module.get_delta_weights(adapter)[0]
+                        weight = (weight.float() + delta.float()).to(weight.dtype)
+        state_dict[name] = weight
+    return state_dict
+
+
+def _mca_named_params(converter: "ModelConverter", models):
+    if not any(isinstance(model, PeftModel) for model in models):
+        for _adapter_name, vp_stage, mca_name, weight in converter._mca_named_params_with_vp_stage(models):
+            yield vp_stage, mca_name, weight
+        return
+    for vp_stage, model in enumerate(models):
+        if isinstance(model, PeftModel):
+            mca_state_dict = _merged_lora_state_dict(model)
+        else:
+            mca_state_dict = model.state_dict_for_save_checkpoint()
+        for mca_name, weight in sorted(mca_state_dict.items()):
+            if not mca_name.endswith("._extra_state"):
+                yield vp_stage, mca_name, weight
+
+
+@torch.no_grad()
 def _all_gather_weights_as_hf_bucket(self: "VirtualModels", models=None, bucket_size: int = None):
     models = models or self.models
     converter = ModelConverter(self.config, to_hf=True)
@@ -35,7 +81,7 @@ def _all_gather_weights_as_hf_bucket(self: "VirtualModels", models=None, bucket_
     expert_parallel = converter.mca_config.expert_model_parallel_size > 1
     only_need_expert = expert_parallel and mpu.get_expert_model_parallel_rank() > 0
 
-    for _adapter_name, vp_stage, mca_name, weight in converter._mca_named_params_with_vp_stage(models):
+    for vp_stage, mca_name, weight in _mca_named_params(converter, models):
         ep_group = mpu.get_expert_model_parallel_group()
         ep_world_size = dist.get_world_size(ep_group)
         if converter._needs_moe_allgather(mca_name, ep_world_size):
